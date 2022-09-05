@@ -19,6 +19,8 @@ module AssistMethods
     puts 'The 4 digit code consists of numbers between 1-6'
     puts 'The code breaker then attempts to break the code in 12 moves or less'
   end
+
+  def guess_checker; end
 end
 
 # the game class
@@ -59,6 +61,7 @@ class MasterMindGame
     while @computer_guess != code
       puts "you have #{@moves} remaining"
       p computer_guess
+      show_hints
       computer_play
       @moves -= 1
     end
@@ -76,9 +79,26 @@ class MasterMindGame
     end
   end
 
-  def player_as_codebreaker
-    puts "you're the codebreaker"
+  def show_hints
+    hint = []
+    @code.each_with_index do |codii, index2|
+      catch :to_outer do
+        computer_guess.each_with_index do |guess, index1|
+          if guess == codii && index1 == index2
+            hint.push('X')
+            throw :to_outer
+          elsif guess == codii && index1 != index2
+            hint.push('O')
+            throw :to_outer
+          end
+        end
+      end
+    end
+    p hint
+    hint = []
   end
+
+  def player_as_codebreaker; end
 end
 
 game = MasterMindGame.new
