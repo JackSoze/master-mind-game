@@ -1,3 +1,4 @@
+require 'pry-byebug'
 # methods that assist Game methods
 module AssistMethods
   def setting_code_error
@@ -25,10 +26,13 @@ class MasterMindGame
   include AssistMethods
 
   def initialize
+    @computer_guess = %w[1 1 1 1]
+    @moves = 12
     @code = []
     greeting
+    gameplay
   end
-  attr_accessor :code, :player_code
+  attr_accessor :code, :player_code, :computer_guess
 
   def greeting
     greeting_messages # in module1
@@ -48,8 +52,28 @@ class MasterMindGame
 
   def player_as_codemaker
     puts "You're the codemaker, select the code"
-    sleep 1.5
     checking_parameters # defined in module 1
+  end
+
+  def gameplay
+    while @computer_guess != code
+      puts "you have #{@moves} remaining"
+      p computer_guess
+      computer_play
+      @moves -= 1
+    end
+    puts "the compuer solved the code, its #{@computer_guess}"
+  end
+
+  def computer_play
+    computer_guess.each_with_index do |guess, index1|
+      @code.each_with_index do |code_element, index2|
+        if guess != code_element && index1 == index2
+          new_guess = (guess.to_i + 1).to_s
+          computer_guess[index1] = new_guess
+        end
+      end
+    end
   end
 
   def player_as_codebreaker
@@ -59,4 +83,3 @@ end
 
 game = MasterMindGame.new
 puts 'the code is..'
-p game.code
