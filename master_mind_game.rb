@@ -1,14 +1,18 @@
 require 'pry-byebug'
 # methods that assist Game methods
 module AssistMethods
-  def setting_code_error
+  def setting_code_error(user)
     puts 'Remember the parameters'
-    @player_code = gets.chomp
+    if user == computer
+      @player_code = gets.chomp
+    elsif user == player
+      player_guess = gets.chomp
+    end
   end
 
   def checking_parameters
     @player_code = gets.chomp # setting_code_error defined in module
-    setting_code_error while player_code.chars.size > 4 || player_code.chars.any? { |char| char > '6' }
+    setting_code_error(computer) while player_code.chars.size > 4 || player_code.chars.any? { |char| char > '6' }
     player_code.chars.each { |char| @code.push(char) }
   end
 
@@ -20,7 +24,13 @@ module AssistMethods
     puts 'The code breaker then attempts to break the code in 12 moves or less'
   end
 
-  def guess_checker; end
+  def end_game_player_message
+    if @code == player_guess
+      puts 'Congratulations, you got the code!!'
+    else
+      puts "thank you for playing, the code is #{@code}"
+    end
+  end
 end
 
 # the game class
@@ -28,13 +38,12 @@ class MasterMindGame
   include AssistMethods
 
   def initialize
-    @computer_guess = %w[1 1 1 1]
+    @computer_guess = %w[1 1 2 2]
     @moves = 12
     @code = []
     greeting
-    gameplay
   end
-  attr_accessor :code, :player_code, :computer_guess
+  attr_accessor :code, :player_code, :computer_guess, :player_guess
 
   def greeting
     greeting_messages # in module1
@@ -48,13 +57,14 @@ class MasterMindGame
     if answer == '1'
       player_as_codemaker
     elsif answer == '2'
-      player_as codebreaker
+      player_as_codebreaker
     end
   end
 
   def player_as_codemaker
     puts "You're the codemaker, select the code"
     checking_parameters # defined in module 1
+    gameplay
   end
 
   def gameplay
@@ -80,7 +90,7 @@ class MasterMindGame
   end
 
   def show_hints
-    hint = []
+    hint = [] # has a bug, fix the bug
     @code.each_with_index do |codii, index2|
       catch :to_outer do
         computer_guess.each_with_index do |guess, index1|
@@ -98,8 +108,33 @@ class MasterMindGame
     hint = []
   end
 
-  def player_as_codebreaker; end
+  def player_as_codebreaker
+    computer_set_code
+    player_play
+    end_game_player_message
+  end
+
+  def player_play
+    player_guess = 0
+    moves = 5
+    while player_guess != @code # repetetion here
+      puts 'input your number, remember the rules'
+      player_guess = gets.chomp
+      setting_code_error(player) while player_guess.chars.size > 4 || player_guess.chars.any? { |char| char > '6' }
+      moves -= 1
+      break if moves.zero?
+    end
+  end
+
+  def computer_set_code
+    puts 'The computer will now set the code'
+    sleep 1.5
+    numbers = %w[1 2 3 4 5 6]
+    4.times do
+      @code.push(numbers.sample)
+    end
+    puts 'Code has been set, good luck'
+  end
 end
 
 game = MasterMindGame.new
-puts 'the code is..'
