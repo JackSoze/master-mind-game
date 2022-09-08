@@ -90,20 +90,18 @@ class MasterMindGame
   end
 
   def show_hints
-    hint = [] # has a bug, fix the bug
+    hint = Array.new(4) # has a bug, fix the bug
+    temp_guess = computer_guess
     @code.each_with_index do |codii, index2|
-      catch :to_outer do
-        computer_guess.each_with_index do |guess, index1|
-          if guess == codii && index1 == index2
-            hint.push('X')
-            throw :to_outer
-          elsif guess == codii && index1 != index2
-            hint.push('O')
-            throw :to_outer
-          end
+      temp_guess.each_with_index do |guess, index1|
+        if guess == codii && index1 == index2
+          hint[index1] = 'X'
+        elsif guess == codii && index1 != index2 && hint[index1].nil?
+          hint[index1] = 'O'
         end
       end
     end
+
     p hint
     hint = []
   end
@@ -117,7 +115,7 @@ class MasterMindGame
   def player_play
     player_guess = 0
     moves = 5
-    while player_guess != @code # repetetion here
+    while player_guess != @code # necessary repetetion here
       puts 'input your number, remember the rules'
       player_guess = gets.chomp
       setting_code_error(player) while player_guess.chars.size > 4 || player_guess.chars.any? { |char| char > '6' }
